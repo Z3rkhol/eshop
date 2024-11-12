@@ -10,7 +10,7 @@ const fileUpload = require('express-fileupload');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Set up MySQL connection pool
+
 const pool = mysql.createPool({
     host: 'localhost',
     user: 'your_username',

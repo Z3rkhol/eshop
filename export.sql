@@ -22,22 +22,59 @@ USE `eshop`;
 -- Dumping structure for table eshop.categories
 CREATE TABLE IF NOT EXISTS `categories` (
   `ID` int(11) NOT NULL AUTO_INCREMENT,
-  `name` text DEFAULT NULL,
+  `name` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`ID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin;
 
 -- Dumping data for table eshop.categories: ~0 rows (approximately)
 
+-- Dumping structure for table eshop.orders
+CREATE TABLE IF NOT EXISTS `orders` (
+  `ID` int(11) NOT NULL AUTO_INCREMENT,
+  `user_id` int(11) NOT NULL,
+  `product_id` int(11) NOT NULL,
+  `quantity` int(11) NOT NULL,
+  `status` enum('pending','completed','cancelled') NOT NULL DEFAULT 'pending',
+  `created_at` timestamp NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `total_price` decimal(10,2) NOT NULL DEFAULT 0.00,
+  PRIMARY KEY (`ID`),
+  KEY `user_id` (`user_id`),
+  KEY `product_id` (`product_id`),
+  CONSTRAINT `orders_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`ID`) ON DELETE CASCADE,
+  CONSTRAINT `orders_ibfk_2` FOREIGN KEY (`product_id`) REFERENCES `products` (`ID`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin;
+
+-- Dumping data for table eshop.orders: ~0 rows (approximately)
+
+-- Dumping structure for table eshop.order_items
+CREATE TABLE IF NOT EXISTS `order_items` (
+  `ID` int(11) NOT NULL AUTO_INCREMENT,
+  `order_id` int(11) NOT NULL,
+  `product_id` int(11) NOT NULL,
+  `quantity` int(11) NOT NULL,
+  `price` decimal(10,2) NOT NULL,
+  PRIMARY KEY (`ID`),
+  KEY `order_id` (`order_id`),
+  KEY `product_id` (`product_id`),
+  CONSTRAINT `FK_order_items_orders` FOREIGN KEY (`order_id`) REFERENCES `orders` (`ID`) ON DELETE CASCADE,
+  CONSTRAINT `FK_order_items_products` FOREIGN KEY (`product_id`) REFERENCES `products` (`ID`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin;
+
+-- Dumping data for table eshop.order_items: ~0 rows (approximately)
+
 -- Dumping structure for table eshop.products
 CREATE TABLE IF NOT EXISTS `products` (
   `ID` int(11) NOT NULL AUTO_INCREMENT,
-  `price` int(11) DEFAULT NULL,
-  `name` int(11) DEFAULT NULL,
-  `stock` int(11) DEFAULT NULL,
+  `price` decimal(10,2) NOT NULL DEFAULT 0.00,
+  `name` varchar(255) NOT NULL,
+  `stock` int(11) NOT NULL DEFAULT 0,
   `category_id` int(11) DEFAULT NULL,
+  `image` varchar(255) DEFAULT NULL,
+  `currency` enum('Kč','€') NOT NULL DEFAULT 'Kč',
   PRIMARY KEY (`ID`),
   KEY `category_id` (`category_id`),
-  CONSTRAINT `FK_products_categories` FOREIGN KEY (`category_id`) REFERENCES `categories` (`ID`) ON DELETE NO ACTION ON UPDATE NO ACTION
+  CONSTRAINT `FK_products_categories` FOREIGN KEY (`category_id`) REFERENCES `categories` (`ID`) ON DELETE SET NULL ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin;
 
 -- Dumping data for table eshop.products: ~0 rows (approximately)
@@ -46,11 +83,13 @@ CREATE TABLE IF NOT EXISTS `products` (
 CREATE TABLE IF NOT EXISTS `users` (
   `ID` int(11) NOT NULL AUTO_INCREMENT,
   `is_admin` tinyint(4) DEFAULT NULL,
-  `username` tinytext DEFAULT NULL,
-  `pass` tinytext DEFAULT NULL,
-  `email` tinytext DEFAULT NULL,
-  `sales` int(11) DEFAULT NULL,
-  PRIMARY KEY (`ID`)
+  `username` varchar(255) NOT NULL,
+  `pass` varchar(255) NOT NULL,
+  `email` varchar(255) NOT NULL,
+  `sales` int(11) NOT NULL DEFAULT 0,
+  PRIMARY KEY (`ID`),
+  UNIQUE KEY `unique_username` (`username`),
+  UNIQUE KEY `unique_email` (`email`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin;
 
 -- Dumping data for table eshop.users: ~0 rows (approximately)
