@@ -4,7 +4,7 @@ const mysql = require('mysql2');  // Import mysql2
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Set up MySQL connection pool
+
 const pool = mysql.createPool({
     host: 'localhost',          // Database host
     user: 'root',      // Database username
